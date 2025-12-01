@@ -1,41 +1,46 @@
 const canvas = document.getElementById("Canvas");
 const ctx = canvas.getContext("2d");
 
-function drawLine(sx, sy, ex, ey, color) {
+function drawLine(sx, sy, ex, ey, color, bs) {
   ctx.setLineDash([]);
   ctx.beginPath();
   ctx.moveTo(sx, sy);
   ctx.lineTo(ex, ey);
   ctx.strokeStyle = color;
+  ctx.lineWidth = bs;
   ctx.stroke();
 }
 
-function drawCircle(x, y, r, color) {
+function drawCircle(x, y, r, color, bs) {
   ctx.setLineDash([]);
   ctx.beginPath();
   ctx.arc(x, y, r, 0, 2 * Math.PI);
   ctx.strokeStyle = color;
+  ctx.lineWidth = bs;
   ctx.stroke();
 }
 
-function drawRect(x, y, w, h, color) {
+function drawRect(x, y, w, h, color, bs) {
   ctx.setLineDash([]);
   ctx.beginPath();
   ctx.strokeStyle = color;
+  ctx.lineWidth = bs;
   ctx.strokeRect(x, y, w, h);
 }
 
-function drawSolCircle(x, y, r, color) {
+function drawSolCircle(x, y, r, color, bs) {
   ctx.setLineDash([]);
   ctx.fillStyle = color;
+  ctx.lineWidth = bs;
   ctx.beginPath();
   ctx.arc(x, y, r, 0, 2 * Math.PI);
   ctx.fill();
 }
 
-function drawSolRect(x, y, w, h, color) {
+function drawSolRect(x, y, w, h, color, bs) {
   ctx.setLineDash([]);
   ctx.fillStyle = color;
+  ctx.lineWidth = bs;
   ctx.beginPath();
   ctx.fillRect(x, y, w, h);
 }
@@ -44,6 +49,7 @@ function dottedRect(x, y, w, h, bc) {
   ctx.beginPath();
   ctx.setLineDash([5, 3]);
   ctx.strokeStyle = bc;
+  ctx.lineWidth = 2;
   ctx.strokeRect(x, y, w, h);
   ctx.setLineDash([]);
   ctx.fillStyle = "grey";
@@ -96,8 +102,8 @@ function lineSelect(sx, sy, ex, ey) {
 }
 
 function drawCross(x, y, color) {
-  drawLine(x - 3, y, x + 3, y, color);
-  drawLine(x, y - 3, x, y + 3, color);
+  drawLine(x - 3, y, x + 3, y, color, 2);
+  drawLine(x, y - 3, x, y + 3, color, 2);
 }
 
 let gridRow = null;
@@ -106,7 +112,7 @@ let crossHist = [];
 
 function drawGrid(size) {
   if (size <= 0) return;
-  const canvasW = 1150;
+  const canvasW = 1200;
   const canvasH = 600;
   gridRow = Math.floor(canvasH / size);
   gridCol = Math.floor(canvasW / size);

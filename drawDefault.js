@@ -22,7 +22,6 @@ function copyNPaste(copyArr, pasteArr) {
   pasteArr.push(copy);
 }
 
-//目前:方形有bug
 function drawDefault(mouse) {
   const cvCoord = canvas.getBoundingClientRect();
   let x = mouse.clientX - cvCoord.left;
@@ -34,7 +33,7 @@ function drawDefault(mouse) {
       canvas.removeEventListener("click", drawDefault);
       canvas.addEventListener("click", endPoint);
     } else if (rectTrack === true) {
-      drawRect(x, y, 55, 55, currColor);
+      drawRect(x, y, 55, 55, currColor, currSize);
       shapeHist.push({
         shape: "rect",
         x: x,
@@ -42,26 +41,28 @@ function drawDefault(mouse) {
         w: 55,
         h: 55,
         color: currColor,
+        bs: currSize,
         ff: false,
       });
       redoList.length = 0;
       copyNPaste(shapeHist, canvasHist);
       rectTrack = false;
     } else if (circleTrack === true) {
-      drawCircle(x, y, 35, currColor);
+      drawCircle(x, y, 35, currColor, currSize);
       shapeHist.push({
         shape: "circle",
         x: x,
         y: y,
         r: 35,
         color: currColor,
+        bs: currSize,
         ff: false,
       });
       redoList.length = 0;
       copyNPaste(shapeHist, canvasHist);
       circleTrack = false;
     } else if (solRectTrack === true) {
-      drawSolRect(x, y, 55, 55, currColor);
+      drawSolRect(x, y, 55, 55, currColor, currSize);
       shapeHist.push({
         shape: "rect",
         x: x,
@@ -69,19 +70,21 @@ function drawDefault(mouse) {
         w: 55,
         h: 55,
         color: currColor,
+        bs: currSize,
         ff: true,
       });
       redoList.length = 0;
       copyNPaste(shapeHist, canvasHist);
       solRectTrack = false;
     } else if (solCircleTrack === true) {
-      drawSolCircle(x, y, 35, currColor);
+      drawSolCircle(x, y, 35, currColor, currSize);
       shapeHist.push({
         shape: "circle",
         x: x,
         y: y,
         r: 35,
         color: currColor,
+        bs: currSize,
         ff: true,
       });
       redoList.length = 0;
@@ -95,7 +98,7 @@ function drawDefault(mouse) {
       canvas.removeEventListener("click", drawDefault);
       canvas.addEventListener("click", endPoint);
     } else if (rectTrack === true) {
-      drawRect(snapXY.x - 25, snapXY.y - 25, 50, 50, currColor);
+      drawRect(snapXY.x - 25, snapXY.y - 25, 50, 50, currColor, currSize);
       shapeHist.push({
         shape: "rect",
         x: snapXY.x - 25,
@@ -103,26 +106,28 @@ function drawDefault(mouse) {
         w: 50,
         h: 50,
         color: currColor,
+        bs: currSize,
         ff: false,
       });
       redoList.length = 0;
       copyNPaste(shapeHist, canvasHist);
       rectTrack = false;
     } else if (circleTrack === true) {
-      drawCircle(snapXY.x, snapXY.y, 35, currColor);
+      drawCircle(snapXY.x, snapXY.y, 35, currColor, currSize);
       shapeHist.push({
         shape: "circle",
         x: snapXY.x,
         y: snapXY.y,
         r: 35,
         color: currColor,
+        bs: currSize,
         ff: false,
       });
       redoList.length = 0;
       copyNPaste(shapeHist, canvasHist);
       circleTrack = false;
     } else if (solRectTrack === true) {
-      drawSolRect(snapXY.x - 25, snapXY.y - 25, 50, 50, currColor);
+      drawSolRect(snapXY.x - 25, snapXY.y - 25, 50, 50, currColor, currSize);
       shapeHist.push({
         shape: "rect",
         x: snapXY.x - 25,
@@ -130,19 +135,21 @@ function drawDefault(mouse) {
         w: 50,
         h: 50,
         color: currColor,
+        bs: currSize,
         ff: true,
       });
       redoList.length = 0;
       copyNPaste(shapeHist, canvasHist);
       solRectTrack = false;
     } else if (solCircleTrack === true) {
-      drawSolCircle(snapXY.x, snapXY.y, 35, currColor);
+      drawSolCircle(snapXY.x, snapXY.y, 35, currColor, currSize);
       shapeHist.push({
         shape: "circle",
         x: snapXY.x,
         y: snapXY.y,
         r: 35,
         color: currColor,
+        bs: currSize,
         ff: true,
       });
       redoList.length = 0;
@@ -160,11 +167,11 @@ function endPoint(mouse) {
     if (!snapMode) {
       lineEX = mouse.clientX - cvCoord.left;
       lineEY = mouse.clientY - cvCoord.top;
-      drawLine(lineSX, lineSY, lineEX, lineEY, currColor);
+      drawLine(lineSX, lineSY, lineEX, lineEY, currColor, currSize);
     } else {
       lineEX = snapXY.x;
       lineEY = snapXY.y;
-      drawLine(lineSX, lineSY, lineEX, lineEY, currColor);
+      drawLine(lineSX, lineSY, lineEX, lineEY, currColor, currSize);
     }
     shapeHist.push({
       shape: "line",
@@ -173,6 +180,7 @@ function endPoint(mouse) {
       ex: lineEX,
       ey: lineEY,
       color: currColor,
+      bs: currSize,
     });
     redoList.length = 0;
     copyNPaste(shapeHist, canvasHist);
@@ -185,26 +193,36 @@ function endPoint(mouse) {
 //功能鍵
 line.addEventListener("click", () => {
   lineTrack = true;
+  doodleMode = false;
+  eraseMode = false;
   canvas.removeEventListener("click", drawDefault);
   canvas.addEventListener("click", drawDefault);
 });
 rect.addEventListener("click", () => {
   rectTrack = true;
+  doodleMode = false;
+  eraseMode = false;
   canvas.removeEventListener("click", drawDefault);
   canvas.addEventListener("click", drawDefault);
 });
 circle.addEventListener("click", () => {
   circleTrack = true;
+  doodleMode = false;
+  eraseMode = false;
   canvas.removeEventListener("click", drawDefault);
   canvas.addEventListener("click", drawDefault);
 });
 solRect.addEventListener("click", () => {
   solRectTrack = true;
+  doodleMode = false;
+  eraseMode = false;
   canvas.removeEventListener("click", drawDefault);
   canvas.addEventListener("click", drawDefault);
 });
 solCircle.addEventListener("click", () => {
   solCircleTrack = true;
+  doodleMode = false;
+  eraseMode = false;
   canvas.removeEventListener("click", drawDefault);
   canvas.addEventListener("click", drawDefault);
 });

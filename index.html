@@ -1,93 +1,141 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Aurora's Canvas</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap');
+    </style>
   </head>
   <body>
     <div style="display: flex">
       <div class="function">
-        <button id="line" class="main-btn">/</button>
 
-        <div class="button-group rect-group">
-          <button id="rect" class="main-btn">&#8414;</button>
-         <div id="rectOptions" class="slide-options">
-          <button id="solidRect" class="slide-btn">&#11035;</button>
+        <div class="paint-tool">
+          <button id="default-cursor"><i class="fa-solid fa-computer-mouse" title='Return to cursor'></i></button>
+          <button id="pencil"><i class="fa-solid fa-pen" title="Pencil"></i></button>
+          <button id="eraser"><i class="fa-solid fa-eraser" title="Eraser"></i></button>
+        </div>
+
+        <div class="shapes">
+          <button id="line"><i class="fa-solid fa-slash" title="Line"></i></button>
+
+          <div class="shape-group rect-group">
+            <button id="rect"><i class="fa-regular fa-square" title="Hollow rectangle"></i></button>
+            <button id="solidRect"><i class="fa-solid fa-square" title="Solid rectangle"></i></button>
           </div>
-        </div> 
-        
-        <div class="button-group circle-group">
-          <button id="circle" class="main-btn">&#9711;</button>
-          <div id="circleOptions" class="slide-options">
-            <button id="solidCircle" class="slide-btn">&#9899;</button>
+
+          <div class="shape-group">
+            <button id="circle"><i class="fa-regular fa-circle" title="Hollow circle"></i></button>
+            <button id="solidCircle"><i class="fa-solid fa-circle" title="Solid circle"></i></button>
           </div>
         </div>
-      </div>
+        
+     </div>
 
       <div class="canvas-container">
-        <div class="edit">
-          <button id="undo"><i class="fa-solid fa-angles-left"></i></button>
-          <button id="redo"><i class="fa-solid fa-angles-right"></i></button>
-          <button id="download"><i class="fa-solid fa-download"></i></button>
-          <button id="load"><i class="fa-solid fa-folder-open"></i></button>
-            <input type="file" id="fileInput" accept=".json" style="display:none">
-          <button id="clearCanvas"><i class="fa-solid fa-rotate"></i></button>
-    
-           <label class="grid">
-             <span>grid</span>
-             <input type="checkbox" id="checkbox1">
-            </label>
-           <label class="grid">
-             <span>snap to grid</span>
-             <input type="checkbox" id="checkbox2">
-             </label>
-          
-        </div>
-        <canvas id="Canvas" width="1150" height="600"></canvas><br />
-      </div>
+      <div class="edit">
+        <button id="undo"><i class="fa-solid fa-angles-left" title="Undo"></i></button>
+        <button id="redo"><i class="fa-solid fa-angles-right" title="Redo"></i></button>
+        
+        <button id="download"><i class="fa-solid fa-download" title="Download file"></i></button>
+        <button id="load"><i class="fa-solid fa-folder-open" title="Load file"></i></button>
+        <input
+          type="file"
+          id="fileInput"
+          accept=".json"
+          style="display: none"
+        />
+        <button id="clearCanvas"><i class="fa-solid fa-rotate" title="Clear all"></i></button>
 
-      <div class='picker-area'>
-        <div class="'color-picker">
-          <div class="color-display-row">
-            <div id="color-indicator" class="color-indicator"></div>
+        <label class="grid">
+          <span><i class="fa-solid fa-table-cells-large" title="Show Grid"></i></span>
+          <input type="checkbox" id="checkbox1" />
+        </label>
+        <label class="grid">
+          <span><i class="fa-solid fa-crosshairs" title="Snap to Grid"></i></span>
+          <input type="checkbox" id="checkbox2" />
+        </label>
+        
+        <div class="slider-container">
+          <input type="range" min="1" max="10" value="5" id="slider">
+          <div class ='brush-size'></div>
+        </div>
+      </div>
+      <canvas id="Canvas" width="1200" height="600"></canvas><br />
+    </div>
+
+    <div class="picker-area">
+      <div class="'color-picker">
+        <div class="color-display-row">
+          <div id="color-indicator" class="color-indicator"></div>
 
           <div class="content">
             <ul id="color-codes">
               <li id="hex-code">HEX:#fff</li>
               <li id="rgb-code">RGB:rgb(255,255,255)</li>
-             <li id="hsl-code">HSL:hsl(0,0%,100%)</li>
-          </ul>
-       </div>
-      </div>
+              <li id="hsl-code">HSL:hsl(0,0%,100%)</li>
+            </ul>
+          </div>
+        </div>
 
         <div id="color-picker"></div>
-        </div>
       </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-        <script>
-        let colorIndicator=document.getElementById('color-indicator')
-         let hexCode=document.getElementById('hex-code')
-         let rgbCode=document.getElementById('rgb-code')
-         let hslCode=document.getElementById('hsl-code')
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <script>
+      let colorIndicator = document.getElementById("color-indicator");
+      let hexCode = document.getElementById("hex-code");
+      let rgbCode = document.getElementById("rgb-code");
+      let hslCode = document.getElementById("hsl-code");
 
-         let currColor='#fff'
-          const colorPicker=new iro.ColorPicker('#color-picker', {width:150,color:'#fff'})
-          colorPicker.on('color:change',function(color){colorIndicator.style.backgroundColor=color.hexString;
-            currColor=color.hexString;
-            hexCode.textContent="HEX: "+color.hexString;
-            rgbCode.textContent="RGB: "+color.rgbString;
-            hslCode.textContent="HSL: "+color.hslString;
-          })
-        </script>
+      let currColor = "#fff";
+      const colorPicker = new iro.ColorPicker("#color-picker", {
+        width: 150,
+        color: "#fff",
+      });
+
+      colorPicker.on("color:change", function (color) {
+        colorIndicator.style.backgroundColor = color.hexString;
+        currColor = color.hexString;
+        hexCode.textContent = "HEX: " + color.hexString;
+        rgbCode.textContent = "RGB: " + color.rgbString;
+        hslCode.textContent = "HSL: " + color.hslString;
+      });
+    </script>
+
+    <script>
+      const slider=document.getElementById('slider');
+      const brushSize=document.querySelector('.brush-size');
+      let currSize=5;
+
+      function sizeCalc(value){
+        const dia=value*2;
+        brushSize.style.width=`${dia}px`;
+        brushSize.style.height=`${dia}px`;
+      }
+
+      slider.addEventListener('input',function(){
+        currSize=parseInt(this.value);
+        sizeCalc(currSize);
+      })
+      sizeCalc(parseInt(slider.value));
+    </script>
 
     <script src="drawShape.js"></script>
     <script src="drawDefault.js"></script>
+    <script src="doodle.js"></script>
     <script src="resizeODrag.js"></script>
     <script src="undoRedo.js"></script>
     <script src="download.js"></script>
     <script src="grid.js"></script>
-
-
   </body>
 </html>

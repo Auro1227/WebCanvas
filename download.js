@@ -4,7 +4,7 @@ const fileInput = document.getElementById("fileInput");
 const clear = document.getElementById("clearCanvas");
 
 function toDownload() {
-  const customName = prompt("請輸入檔名", "save_drawing.json");
+  const customName = prompt("請輸入檔名", "my_masterpiece.json");
   const stringData = JSON.stringify(shapeHist);
   if (customName === null) {
     return;
@@ -68,4 +68,5 @@ function clearCanvas() {
   snapXY = null;
   shapeHist.length = 0;
   canvasHist.length = 0;
+  drawHist.length = 0;
 }

@@ -7,6 +7,7 @@ snapGrid.addEventListener("change", function () {
 
 let gridHist = null;
 let snapMode = false;
+let gridSize = 0;
 
 function showGrid() {
   if (grid.checked) {

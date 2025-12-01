@@ -17,7 +17,7 @@ function cursorStyle(type) {
   } else if (type === "tr" || type === "dl") {
     return "nesw-resize";
   }
-  return "default";
+  return "crosshair";
 }
 
 function resizeODrag(mouse) {
@@ -51,6 +51,9 @@ function resizeODrag(mouse) {
   }
 
   for (let i = shapeHist.length - 1; i >= 0; i--) {
+    if (shapeHist[i].shape === "pencil" || shapeHist[i].shape === "eraser") {
+      continue;
+    }
     if (inShape(shapeHist[i], x, y)) {
       foundShapeInd = i;
       break;
@@ -64,7 +67,7 @@ function resizeODrag(mouse) {
   if (dragCorner) {
     canvas.style.cursor = cursorStyle(dragCorner);
   } else {
-    canvas.style.cursor = "default";
+    canvas.style.cursor = "crosshair";
   }
   if (
     snapMode &&
@@ -120,7 +123,7 @@ function inShape(histInd, x, y) {
     const dx = x - xx;
     const dy = y - yy;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist <= 6) return true; // hit threshold
+    if (dist <= 6) return true;
   }
   if (histInd.shape === "circle") {
     let a = x - histInd.x;
@@ -149,13 +152,10 @@ function selectedBox() {
   selectedShape = shapeHist[selectedBoxInd];
   redraw();
 }
+
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (
-    typeof gridSize !== "undefined" &&
-    Number.isFinite(gridSize) &&
-    gridSize > 0
-  ) {
+  if (gridSize > 0) {
     drawGrid(gridSize);
   }
   rectHist = [];
@@ -170,33 +170,64 @@ function redraw() {
         shapeHist[i].sy,
         shapeHist[i].ex,
         shapeHist[i].ey,
-        color
+        color,
+        shapeHist[i].bs
       );
-    }
-    if (shapeHist[i].shape === "circle" && shapeHist[i].ff === false) {
-      drawCircle(shapeHist[i].x, shapeHist[i].y, shapeHist[i].r, color);
-    }
-    if (shapeHist[i].shape === "rect" && shapeHist[i].ff === false) {
+    } else if (shapeHist[i].shape === "circle" && shapeHist[i].ff === false) {
+      drawCircle(
+        shapeHist[i].x,
+        shapeHist[i].y,
+        shapeHist[i].r,
+        color,
+        shapeHist[i].bs
+      );
+    } else if (shapeHist[i].shape === "rect" && shapeHist[i].ff === false) {
       drawRect(
         shapeHist[i].x,
         shapeHist[i].y,
         shapeHist[i].w,
         shapeHist[i].h,
-        color
+        color,
+        shapeHist[i].bs
       );
-    }
-    if (shapeHist[i].shape === "rect" && shapeHist[i].ff === true) {
+    } else if (shapeHist[i].shape === "rect" && shapeHist[i].ff === true) {
       drawSolRect(
         shapeHist[i].x,
         shapeHist[i].y,
         shapeHist[i].w,
         shapeHist[i].h,
-        color
+        color,
+        shapeHist[i].bs
       );
+    } else if (shapeHist[i].shape === "circle" && shapeHist[i].ff === true) {
+      drawSolCircle(
+        shapeHist[i].x,
+        shapeHist[i].y,
+        shapeHist[i].r,
+        color,
+        shapeHist[i].bs
+      );
+    } else if (
+      shapeHist[i].shape === "pencil" ||
+      shapeHist[i].shape === "eraser"
+    ) {
+      if (shapeHist[i].shape === "pencil") {
+        ctx.globalCompositeOperation = "source-over";
+        ctx.strokeStyle = shapeHist[i].color;
+      } else if (shapeHist[i].shape === "eraser") {
+        ctx.globalCompositeOperation = "destination-out";
+      }
+      const pts = shapeHist[i].points;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let j = 1; j < pts.length; j++) {
+        ctx.lineTo(pts[j].x, pts[j].y);
+      }
+      ctx.lineWidth = shapeHist[i].bs;
+      ctx.stroke();
+      ctx.closePath();
     }
-    if (shapeHist[i].shape === "circle" && shapeHist[i].ff === true) {
-      drawSolCircle(shapeHist[i].x, shapeHist[i].y, shapeHist[i].r, color);
-    }
+    ctx.globalCompositeOperation = "source-over";
   }
 
   if (selectedBoxInd !== null) {
@@ -226,7 +257,6 @@ function redraw() {
       );
     }
   }
-
   if (snapXY) {
     drawCross(snapXY.x, snapXY.y, "red");
   }
@@ -374,6 +404,7 @@ function move(mouse) {
   let y = mouse.clientY - cvCoord.top;
   if (!moveMode) return;
   if (!selectedShape) return;
+  canvas.style.cursor = "move";
   if (selectedShape.shape === "line") {
     let distX = x - currX;
     let distY = y - currY;
